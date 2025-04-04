@@ -1,0 +1,524 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MIST List Search and Converter</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+        :root {
+            --bg-color: #f0f0f0;
+            --text-color: #333;
+            --container-bg: rgba(255, 255, 255, 0.8);
+            --box-bg: #ffffff;
+            --box-border: #e0e0e0;
+            --button-bg: #4CAF50;
+            --button-text: white;
+            --neon-color: #00c3ff;
+            --select-bg: #ffffff;
+            --select-border: #cccccc;
+            --footer-bg: rgba(0, 0, 0, 0.1);
+            --theme-toggle-bg: #f0f0f0;
+            --theme-toggle-icon: #ffd700;
+        }
+
+        .dark-theme {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --container-bg: rgba(44, 44, 44, 0.8);
+            --box-bg: #2c2c2c;
+            --box-border: #444;
+            --button-bg: #45a049;
+            --button-text: #f0f0f0;
+            --select-bg: #2c2c2c;
+            --select-border: #555;
+            --footer-bg: rgba(255, 255, 255, 0.1);
+            --theme-toggle-bg: #333;
+            --theme-toggle-icon: #ffffff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: url('https://i.ibb.co/p1wsN2d/carr.gif');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .neon-title {
+            font-family: 'Pacifico', cursive;
+            font-size: 48px;
+            text-align: center;
+            color: var(--neon-color);
+            text-shadow: 
+                0 0 5px var(--neon-color),
+                0 0 10px var(--neon-color),
+                0 0 20px var(--neon-color),
+                0 0 40px var(--neon-color);
+            animation: neon-flicker 1.5s infinite alternate;
+        }
+
+        @keyframes neon-flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow: 
+                    0 0 5px var(--neon-color),
+                    0 0 10px var(--neon-color),
+                    0 0 20px var(--neon-color),
+                    0 0 40px var(--neon-color);
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+            }
+        }
+
+        .title-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .title-image {
+            width: 100px;
+            height: 100px;
+            margin-left: 20px;
+        }
+
+        #app {
+            background-color: var(--container-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .box {
+            width: 100%;
+            flex: 1 1 300px;
+            min-height: 300px;
+            height: 50vh;
+        }
+
+        .center-column {
+            order: 0;
+            flex: 0 0 auto;
+            width: auto;
+            margin: 15px 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            resize: none;
+            font-family: monospace;
+            background-color: var(--box-bg);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        button, select {
+            background-color: var(--button-bg);
+            border: none;
+            color: var(--button-text);
+            padding: 12px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        select {
+            background-color: var(--select-bg);
+            color: var(--text-color);
+            border: 1px solid var(--select-border);
+        }
+
+        button:hover, select:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        #themeToggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--theme-toggle-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        #themeToggle::before {
+            content: '☀️';
+            font-size: 30px;
+            position: absolute;
+            transition: all 0.3s ease;
+        }
+
+        #themeToggle.dark::before {
+            content: '🌙';
+            transform: translateY(-60px);
+        }
+
+        #themeToggle::after {
+            content: '🌙';
+            font-size: 30px;
+            position: absolute;
+            transition: all 0.3s ease;
+            transform: translateY(60px);
+        }
+
+        #themeToggle.dark::after {
+            transform: translateY(0);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #selectFolder {
+            margin-bottom: 20px;
+        }
+
+        footer {
+            margin-top: 20px;
+            padding: 10px;
+            text-align: center;
+            background-color: var(--footer-bg);
+            border-radius: 10px;
+        }
+
+        .github-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .github-link:hover {
+            transform: scale(1.1);
+        }
+
+        .github-link img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .discord-link {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .discord-link:hover {
+            transform: scale(1.1);
+        }
+
+        .discord-link img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        @media (max-width: 768px) {
+            .neon-title {
+                font-size: 32px;
+            }
+
+            .title-image {
+                width: 60px;
+                height: 60px;
+                margin-left: 10px;
+            }
+
+            .container {
+                flex-direction: column;
+            }
+
+            .box {
+                width: 100%;
+                height: 40vh;
+            }
+
+            .center-column img {
+                width: 70px;
+                height: 70px;
+            }
+
+            #themeToggle {
+                top: 10px;
+                right: 10px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .github-link, .discord-link {
+                bottom: 10px;
+                right: 10px;
+            }
+
+            .discord-link {
+                bottom: 70px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .neon-title {
+                font-size: 24px;
+            }
+
+            .title-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .title-image {
+                margin: 10px 0 0 0;
+            }
+
+            .center-column {
+                flex-direction: row;
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            button, select {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            textarea {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title-container">
+        <div class="neon-title">MIST List Search and Converter</div>
+        <img src="https://i.ibb.co/WgkSgzc/f5f56807-238e-40b8-a6e7-4baf2608d219-1.gif" alt="Animated GIF" class="title-image">
+    </div>
+    <div id="app">
+        <div id="themeToggle"></div>
+        <button id="selectFolder">Select Folder</button>
+        <div class="container">
+            <div class="box">
+                <textarea id="inputList" placeholder="Paste your list here or select a folder to extract model names"></textarea>
+            </div>
+            <div class="center-column">
+                <img src="https://i.ibb.co/S5NKFxP/bloodbros-search.gif" alt="Animated search list" width="100" height="100">
+                <img src="https://i.ibb.co/nQ5fph8/loopfnct.gif" alt="Convert icon" width="100" height="100">
+                <select id="formatSelect">
+                    <option value="qbcore">QBCore</option>
+                    <option value="ec-dealership">ec-dealership</option>
+                    <option value="mist-cars-spawn">mist-cars-spawn</option>
+                    <option value="pdm">PDM</option>
+                    <option value="0r_vehicleshop">0r_vehicleshop</option>
+                    <option value="lsrp_vehicleshop">lsrp_vehicleshop</option>
+                </select>
+                <button id="convertList">Convert List</button>
+            </div>
+            <div class="box">
+                <textarea id="outputList" readonly></textarea>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="copyResult" style="display:none;">Copy Converted List</button>
+        </div>
+    </div>
+
+    <footer>
+        This application was created by Mist to help convert several list formats
+    </footer>
+
+    <a href="#" id="discordButton" class="discord-link">
+        <img src="https://i.ibb.co/fX60rvM/83cdd1dd40cdb87020949e0f075b9648.gif" alt="Discord Icon" />
+    </a>
+
+    <a href="https://github.com/MIST145" target="_blank" class="github-link">
+        <img src="https://media1.tenor.com/m/A15H8E1VUh8AAAAC/github-cat.gif" alt="GitHub Cat" />
+    </a>
+
+    <script>
+        const selectFolderBtn = document.getElementById('selectFolder');
+        const convertListBtn = document.getElementById('convertList');
+        const inputListArea = document.getElementById('inputList');
+        const outputListArea = document.getElementById('outputList');
+        const copyResultBtn = document.getElementById('copyResult');
+        const themeToggle = document.getElementById('themeToggle');
+        const formatSelect = document.getElementById('formatSelect');
+        const discordButton = document.getElementById('discordButton');
+
+        selectFolderBtn.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.webkitdirectory = true;
+            input.multiple = true;
+
+            input.onchange = async e => {
+                const files = Array.from(e.target.files);
+                const vehiclesFiles = files.filter(file => file.name.endsWith('vehicles.meta'));
+                
+                if (vehiclesFiles.length === 0) {
+                    inputListArea.value = 'No vehicles.meta files found in the selected folder.';
+                    return;
+                }
+
+                const modelNames = [];
+
+                for (const file of vehiclesFiles) {
+                    const content = await file.text();
+                    const lines = content.split('\n');
+
+                    for (const line of lines) {
+                        if (line.includes('<modelName>')) {
+                            const modelName = line.trim().split('>')[1].split('<')[0];
+                            modelNames.push(modelName);
+                        }
+                    }
+                }
+
+                inputListArea.value = modelNames.map(name => `"${name}",`).join('\n');
+            };
+
+            input.click();
+        });
+
+        convertListBtn.addEventListener('click', () => {
+            const inputList = inputListArea.value.split('\n');
+            let convertedList;
+
+            if (formatSelect.value === 'qbcore') {
+                convertedList = inputList.map(item => {
+                    const modelName = item.replace(/[",]/g, '').trim();
+                    const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                    return `['${modelName}'] = {
+    ['name'] = '${name}',
+    ['brand'] = 'Unknown',
+    ['model'] = '${modelName}',
+    ['price'] = 50000,
+    ['category'] = 'unknown',
+    ['categoryLabel'] = 'Unknown',
+    ['hash'] = \`${modelName}\`,
+    ['shop'] = 'pdm',
+},`;
+                }).join('\n\n');
+            } else if (formatSelect.value === 'ec-dealership') {
+                convertedList = inputList.map(item => {
+                    const modelName = item.replace(/[",]/g, '').trim();
+                    const label = modelName.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
+                    return `{
+    type = "car",
+    model = "${modelName}",
+    label = "${label}",
+    price = 10
+},`;
+                }).join('\n');
+            } else if (formatSelect.value === 'mist-cars-spawn') {
+                convertedList = inputList.map(item => {
+                    const modelName = item.replace(/[",]/g, '').trim();
+                    const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                    return `{nome = "${name}", modelo = "${modelName}", description = "car"},`;
+                }).join('\n');
+            } else if (formatSelect.value === 'pdm') {
+                convertedList = inputList.map(item => {
+                    const modelName = item.replace(/[",]/g, '').trim();
+                    const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                    return `{
+    name = "${name}", model = "${modelName}", 
+    icon = "bars", iconColor = "#ffffff", 
+    price = 100000, description = "This is a description",
+    stats = {
+        maxspeed = "200",
+        acceleration = "3.7",
+        braking = "1.9",
+        handling = "7",
+        steering = "5"
+    }
+},`;
+                }).join('\n\n');
+            } else if (formatSelect.value === '0r_vehicleshop') {
+                convertedList = inputList.map(item => {
+                    const modelName = item.replace(/[",]/g, '').trim();
+                    const label = modelName.replace(/([A-Z])/g, ' $1').trim();
+                    return `{label = "${label}", model = "${modelName}", price = 1},`;
+                }).join('\n');
+            } else if (formatSelect.value === 'lsrp_vehicleshop') {
+                convertedList = inputList.map(item => {
+                    const modelName = item.replace(/[",]/g, '').trim();
+                    const label = modelName.replace(/([A-Z])/g, ' $1').trim();
+                    return `{label = '${label}', VEHICLE_MODEL = joaat('${modelName}'), VEHICLE_PRICE = 20000},`;
+                }).join('\n');
+            }
+
+            outputListArea.value = convertedList;
+            copyResultBtn.style.display = 'inline-block';
+        });
+
+        copyResultBtn.addEventListener('click', () => {
+            outputListArea.select();
+            document.execCommand('copy');
+            alert('Converted list copied to clipboard!');
+        });
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            themeToggle.classList.toggle('dark');
+        });
+
+        discordButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigator.clipboard.writeText('mist_goat').then(() => {
+                alert('Discord username copied to clipboard: mist_goat');
+            }, (err) => {
+                console.error('Could not copy text: ', err);
+            });
+        });
+    </script>
+</body>
+</html>
