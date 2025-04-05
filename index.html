@@ -356,10 +356,22 @@
                 <select id="formatSelect">
                     <option value="qbcore">QBCore</option>
                     <option value="ec-dealership">ec-dealership</option>
-                    <option value="mist-cars-spawn">mist-cars-spawn</option>
+                    <option value="sh-dealer">sh-dealer</option>
+                    <option value="lsrp_vehicleshop">lsrp_vehicleshop</option>
                     <option value="pdm">PDM</option>
                     <option value="0r_vehicleshop">0r_vehicleshop</option>
-                    <option value="lsrp_vehicleshop">lsrp_vehicleshop</option>
+                    <option value="mist-cars-spawn">mist-cars-spawn</option>
+                    <option value="propscreenshotter">propscreenshotter</option>
+                    <option value="stg-vehicleshop">stg-vehicleshop</option>
+                    <option value="sh-dealership">sh-dealership</option>
+                    <option value="sql-vehicles">sql-vehicles</option>
+                    <option value="brutal-vehicleshop">brutal-vehicleshop</option>
+                    <option value="vehicleshop-sql">vehicleshop-sql</option>
+                    <option value="lgf-admin">lgf-admin</option>
+                    <option value="mist-testar-menu">mist-testar-menu</option>
+                    <option value="um-admin">um-admin</option>
+                    <option value="ox-car-spawner">ox-car-spawner</option>
+                    <option value="qr-vehicleshop">qr-vehicleshop</option>
                 </select>
                 <button id="convertList">Convert List</button>
             </div>
@@ -393,6 +405,7 @@
         const themeToggle = document.getElementById('themeToggle');
         const formatSelect = document.getElementById('formatSelect');
         const discordButton = document.getElementById('discordButton');
+        let idCounter = 1;
 
         selectFolderBtn.addEventListener('click', () => {
             const input = document.createElement('input');
@@ -433,11 +446,12 @@
             const inputList = inputListArea.value.split('\n');
             let convertedList;
 
-            if (formatSelect.value === 'qbcore') {
-                convertedList = inputList.map(item => {
-                    const modelName = item.replace(/[",]/g, '').trim();
-                    const name = modelName.replace(/([A-Z])/g, ' $1').trim();
-                    return `['${modelName}'] = {
+            switch (formatSelect.value) {
+                case 'qbcore':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `['${modelName}'] = {
     ['name'] = '${name}',
     ['brand'] = 'Unknown',
     ['model'] = '${modelName}',
@@ -447,29 +461,43 @@
     ['hash'] = \`${modelName}\`,
     ['shop'] = 'pdm',
 },`;
-                }).join('\n\n');
-            } else if (formatSelect.value === 'ec-dealership') {
-                convertedList = inputList.map(item => {
-                    const modelName = item.replace(/[",]/g, '').trim();
-                    const label = modelName.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
-                    return `{
+                    }).join('\n\n');
+                    break;
+
+                case 'ec-dealership':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const label = modelName.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
+                        return `{
     type = "car",
     model = "${modelName}",
     label = "${label}",
     price = 10
 },`;
-                }).join('\n');
-            } else if (formatSelect.value === 'mist-cars-spawn') {
-                convertedList = inputList.map(item => {
-                    const modelName = item.replace(/[",]/g, '').trim();
-                    const name = modelName.replace(/([A-Z])/g, ' $1').trim();
-                    return `{nome = "${name}", modelo = "${modelName}", description = "car"},`;
-                }).join('\n');
-            } else if (formatSelect.value === 'pdm') {
-                convertedList = inputList.map(item => {
-                    const modelName = item.replace(/[",]/g, '').trim();
-                    const name = modelName.replace(/([A-Z])/g, ' $1').trim();
-                    return `{
+                    }).join('\n');
+                    break;
+
+                case 'sh-dealer':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `{ name: "${name}", model: "${modelName}", category: 'categoria', price: 1, image: "${modelName}"},`;
+                    }).join('\n');
+                    break;
+
+                case 'lsrp_vehicleshop':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const label = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `{label = '${label}', VEHICLE_MODEL = joaat('${modelName}'), VEHICLE_PRICE = 20000},`;
+                    }).join('\n');
+                    break;
+
+                case 'pdm':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `{
     name = "${name}", model = "${modelName}", 
     icon = "bars", iconColor = "#ffffff", 
     price = 100000, description = "This is a description",
@@ -481,23 +509,137 @@
         steering = "5"
     }
 },`;
-                }).join('\n\n');
-            } else if (formatSelect.value === '0r_vehicleshop') {
-                convertedList = inputList.map(item => {
-                    const modelName = item.replace(/[",]/g, '').trim();
-                    const label = modelName.replace(/([A-Z])/g, ' $1').trim();
-                    return `{label = "${label}", model = "${modelName}", price = 1},`;
-                }).join('\n');
-            } else if (formatSelect.value === 'lsrp_vehicleshop') {
-                convertedList = inputList.map(item => {
-                    const modelName = item.replace(/[",]/g, '').trim();
-                    const label = modelName.replace(/([A-Z])/g, ' $1').trim();
-                    return `{label = '${label}', VEHICLE_MODEL = joaat('${modelName}'), VEHICLE_PRICE = 20000},`;
-                }).join('\n');
+                    }).join('\n\n');
+                    break;
+
+                case '0r_vehicleshop':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const label = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `{label = "${label}", model = "${modelName}", price = 1},`;
+                    }).join('\n');
+                    break;
+
+                case 'mist-cars-spawn':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `{nome = "${name}", modelo = "${modelName}", description = "car"},`;
+                    }).join('\n');
+                    break;
+
+                case 'propscreenshotter':
+                    // Group all models together in one table
+                    const modelNames = inputList.map(item => item.replace(/[",]/g, '').trim());
+                    convertedList = `Cars["NOME_Cars"] = {\n    "${modelNames.join('",\n    "')}"` +
+                        (modelNames.length > 0 ? '\n}' : '}');
+                    break;
+
+                case 'stg-vehicleshop':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        return `["${modelName}"] = {
+    modelName = "${modelName}",
+    price = 1
+},`;
+                    }).join('\n');
+                    break;
+
+                case 'sh-dealership':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `{ name: "${name}", model: "${modelName}", category: 'Mist', price: 1, image: "${modelName}"},`;
+                    }).join('\n');
+                    break;
+
+                case 'sql-vehicles':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `('${name}', '${modelName}', 1, 'mist'),`;
+                    }).join('\n');
+                    break;
+
+                case 'brutal-vehicleshop':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const label = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `{model = "${modelName}", label = "${label}", price = 1, type = 'car'},`;
+                    }).join('\n');
+                    break;
+
+                case 'vehicleshop-sql':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        return `('${modelName}', '${modelName}', 1, 'category_name', 'shop_name'),`;
+                    }).join('\n');
+                    break;
+
+                case 'lgf-admin':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        const id = idCounter++;
+                        return `{
+    "id": ${id},
+    "name": "${name}",
+    "model": "${modelName}",
+    "image": "https://docs.fivem.net/vehicles/${modelName}.webp",
+    "class": "vip"
+},`;
+                    }).join('\n');
+                    break;
+
+                case 'mist-testar-menu':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        return `{ coords = vector4(-835.02, -3194.83, 13.94, 150), vehicle = "${modelName}"},`;
+                    }).join('\n');
+                    break;
+
+                case 'um-admin':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `{ model = '${modelName}', name = '${name}', brand = 'Default Brand', price = 1, category = 'vip', type = 'automobile', shop = 'pdm' },`;
+                    }).join('\n');
+                    break;
+
+                case 'ox-car-spawner':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        return `{ 
+    label = "Spawn ${modelName}",
+    description = "Car",
+    carModel = "${modelName}",
+},`;
+                    }).join('\n');
+                    break;
+
+                case 'qr-vehicleshop':
+                    convertedList = inputList.map(item => {
+                        const modelName = item.replace(/[",]/g, '').trim();
+                        const name = modelName.replace(/([A-Z])/g, ' $1').trim();
+                        return `["${modelName}"] = {
+    name = "${name}",
+    brand = "Default Brand",
+    model = "${modelName}",
+    image = "",
+    price = 1,
+    category = ""
+},`;
+                    }).join('\n');
+                    break;
+
+                default:
+                    convertedList = "Format not recognized";
             }
 
             outputListArea.value = convertedList;
             copyResultBtn.style.display = 'inline-block';
+            // Reset ID counter after conversion
+            idCounter = 1;
         });
 
         copyResultBtn.addEventListener('click', () => {
